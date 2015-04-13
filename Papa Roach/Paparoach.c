@@ -1,37 +1,43 @@
-#pragma config(Sensor, S3, lightSensor, sensorLightActive, sonarSensor, S1, sonarSensorActive)
+#pragma config(Sensor, S1,     touchSensor,    sensorTouch)
+#pragma config(Sensor, S3,     lightSensor,    sensorLightActive)
 
 task main()
 {
-	int crashDistance= 5;
-	int darkness = 50;
-	int maxSpeed = 60;
-	int minSpeed = 20;
+	// wait 50 msec to initialize light sensor
+	wait1Msec(50);
+
+	int darkness = 25;
+	int highSpeed = -80;
+	int noSpeed = 0;
+	int reverseSpeed = 80;
 
 	while(true)
 	{
 		if(SensorValue[lightSensor] > darkness)
 		{
-			//turn to find space
-			while(SensorValue[sonarSensor] <= crashDistance)
+			// run ahead to find shadow
+			while(SensorValue[touchSensor] == 0 &&
+				SensorValue[lightSensor] > darkness)
 			{
-				motor[motorB] = minSpeed;
-				motor[motorC] = maxSpeed;
+				motor[motorB] = highSpeed;
+				motor[motorC] = highSpeed;
 			}
 
-			//run while is light and space
-			while(SensorValue[lightSensor] > darkness 
-			&& SensorValue[sonarSensor] > crashDistance)
+			// when he encounters an obstacle, stop, spin and continue
+			if (SensorValue[lightSensor] > darkness)
 			{
-				motor[motorB] = maxSpeed;
-				motor[motorC] = maxSpeed;
+				motor[motorB] = noSpeed;
+				motor[motorC] = noSpeed;
+				wait1Msec(250);
+				motor[motorC] = reverseSpeed;
+				wait1Msec(600);
 			}
-			
-			//stop
-			motor[motorB] = 0;
-			motor[motorC] = 0;
-			
+
+			// stop after the turn.
+			// if light is still on, it will advance again.
+			// also, if light was found, this stops the robot
+			motor[motorB] = noSpeed;
+			motor[motorC] = noSpeed;
 		}
 	}
-  
-  
 }
