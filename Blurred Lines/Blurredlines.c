@@ -1,6 +1,6 @@
 #pragma config(Sensor, S3,     lightSensor,         sensorLightActive)
 
-#define SPEED_HIGH 20
+#define SPEED_HIGH 75
 #define SPEED_LOW 5
 #define SPEED_REV -10
 #define SPEED_STOP 0
@@ -9,6 +9,8 @@
 
 #define TURN_RIGHT 0
 #define TURN_LEFT 1
+
+#define TURN_TIME 500
 
 int turn;
 
@@ -62,7 +64,7 @@ task main()
 		if (SensorValue[lightSensor] < LIGHT_WHITE)
 		{
 			aheadFull();
-			wait1Msec(10);
+			//wait1Msec(10);
 		}
 		else
 		{
@@ -70,7 +72,7 @@ task main()
 			if (turn == TURN_RIGHT)
 			{
 				int count = 0;
-				while (count < 1000 && SensorValue[lightSensor] > LIGHT_WHITE)
+				while (count < TURN_TIME && SensorValue[lightSensor] > LIGHT_WHITE)
 				{
 					turnRight();
 					count++;
@@ -83,17 +85,22 @@ task main()
 				// the line is found again
 				if (SensorValue[lightSensor] > LIGHT_WHITE + 10)
 				{
+				motor[motorC] = SPEED_REV;
+				motor[motorB] = SPEED_REV;
+				wait1Msec(20);
+				motor[motorC] = SPEED_STOP;
+				motor[motorB] = SPEED_STOP;
+
 					turn = TURN_LEFT;
-					while (SensorValue[lightSensor] > LIGHT_WHITE)
-					{
-						hardLeft();
-					}
+					hardLeft();
+					wait1Msec(20);
+					while (SensorValue[lightSensor] > LIGHT_WHITE);
 				}
 			}
 			else if (turn == TURN_LEFT)
 			{
 				int count = 0;
-				while (count < 1000 && SensorValue[lightSensor] > LIGHT_WHITE)
+				while (count < TURN_TIME && SensorValue[lightSensor] > LIGHT_WHITE)
 				{
 					turnLeft();
 					count++;
