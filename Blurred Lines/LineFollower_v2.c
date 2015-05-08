@@ -2,7 +2,7 @@
 
 #define TURN_UNIT 50
 
-#define LIGHT_WHITE 30
+#define LIGHT_WHITE 40
 
 #define LEFT 0
 #define RIGHT 1
