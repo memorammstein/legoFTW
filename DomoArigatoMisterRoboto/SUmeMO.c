@@ -46,30 +46,26 @@ void power(direction_type value, int percentage){
 int detectEnemy(){
 	direction = TURN_RIGHT;
 	power(direction, 100);
-	while(!(SensorValue[sonar] < 100 && SensorValue[sonar] > 0)){}
+	while(!(SensorValue[sonar] < 50)){}
 	direction = STOP;
 	power(direction, 100);
-	return 1;
-}
-
-int detectRing(){
-	if(SensorValue[light] < BLACK_LINE){
-		direction =STOP;
-		power(direction, 100);
-	}
 	return 1;
 }
 
 task main()
 {
 	while(true){
-		while(detectEnemy()){
+		if(detectEnemy()){
 			direction = FORWARD;
 			power(direction, 100);
-		}
-		if(detectRing()){
+			while(SensorValue[sonar] < 75 && SensorValue[light] > BLACK_LINE){}
 			direction = STOP;
 			power(direction, 100);
+			if(SensorValue[light] < BLACK_LINE){
+				direction = BACKWARDS;
+				power(direction, 100);
+				wait1Msec(250);
+			}
 		}
 	}
 }
